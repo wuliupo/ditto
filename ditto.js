@@ -310,6 +310,12 @@ function router() {
   var loading = show_loading();
   $.get(path, function(data) {
     $(ditto.error_id).hide();
+    if (data.indexOf('title: ') > 0) {
+        data = data.replace('---', '```').replace('---', '```');
+        // TODO regexp
+        var title = data.indexOf('title: ') > 0 ? data.substring(data.indexOf('title: ') + 7, data.indexOf('layout: ')) : 'Content';
+        data = '# ' + title + '\n\n' + data;
+    }
     $(ditto.content_id).html(marked(data));
     if ($(ditto.content_id + " h1").text() === ditto.document_title) {
       document.title = ditto.document_title;
