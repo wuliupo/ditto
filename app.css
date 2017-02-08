@@ -121,10 +121,10 @@ form.searchBox {
 
 input[type=search] {
   position: absolute;
-  width: calc(100% - 30px);
+  width: calc(100% - 34px);
   height: 30px;
   line-height: 30px;
-  padding: 0 20px 0 10px;
+  padding: 0 24px 0 10px;
   border: none;
 }
 
@@ -132,7 +132,10 @@ input.searchButton {
   position: absolute;
   top: 5px;
   right: 5px;
+  width: 18px;
   height: 18px;
+  background: url(magnifier.jpg) no-repeat center transparent;
+  border: 0;
 }
 
 #content {
@@ -286,6 +289,11 @@ input.searchButton {
 
 #content table tr{background-color:#fff;border-top:1px solid #ccc}
 #content table tr:nth-child(2n){background-color:#f8f8f8}
+
+#loading, #error {
+    text-align: center;
+    font-size: 14px;
+}
 
 @media (min-width: 40rem) {
 	#loading, #error {
