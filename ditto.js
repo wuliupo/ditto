@@ -262,6 +262,7 @@ function normalize_paths() {
 
 function show_error() {
   console.log("SHOW ERORR!");
+  $(ditto.loading_id).hide()
   $(ditto.error_id).show();
 }
 
@@ -295,11 +296,11 @@ function router() {
   if (location.pathname === "/index.html") {
     path = location.pathname.replace("index.html", ditto.index);
     normalize_paths();
-  } else if (path === "") {
+  } else if (!path) {
     path = location.pathname + ditto.index;
     normalize_paths();
   } else {
-    path = path + ".md";
+    path += ".md";
   }
 
   // 取消scroll事件的监听函数
@@ -316,17 +317,18 @@ function router() {
         var title = data.indexOf('title: ') > 0 ? data.substring(data.indexOf('title: ') + 7, data.indexOf('layout: ')) : 'Content';
         data = '# ' + title + '\n\n' + data;
     }
-    $(ditto.content_id).html(marked(data));
-    if ($(ditto.content_id + " h1").text() === ditto.document_title) {
+    var content = $(ditto.content_id);
+    var h1 = content.html(marked(data)).find('h1');
+    if (h1.text() === ditto.document_title) {
       document.title = ditto.document_title;
     } else {
-      document.title = $(ditto.content_id + " h1").text() + " - " + ditto.document_title;
+      document.title = h1.text() + " - " + ditto.document_title;
     }
     normalize_paths();
     create_page_anchors();
 
     // 完成代码高亮
-    $('#content code').map(function() {
+    content.find('code').map(function() {
       Prism.highlightElement(this);
     });
 
@@ -340,11 +342,11 @@ function router() {
       if (location.hash !== '' || Boolean(perc)) {
         if (!Boolean(perc)) {
           $('html, body').animate({
-            scrollTop: ($('#content').offset().top)
+            scrollTop: (content.offset().top)
           }, 300);
         } else {
           $('html, body').animate({
-            scrollTop: ($('body').height()-$(window).height())*perc
+            scrollTop: (content.height()-$(window).height())*perc
           }, 200);
         }
       }

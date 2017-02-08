@@ -339,6 +339,7 @@ input.searchButton {
     left: 0;
     height: 3px;
     background-color: #0A74DA;
+    z-index: 20;
 }
 
 /**
