@@ -14,6 +14,7 @@ var ditto = {
     back_to_top_button: true,
     save_progress: true, // 保存阅读进度
     search_bar: true,
+    document_title: document.title,
 
     // initialize function
     run: initialize
