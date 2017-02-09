@@ -48,7 +48,7 @@ var menu = [];
 
 function initialize() {
    $(document.body).append('<div id="sidebar"></div><div id="content"></div><div id="loading">Loading ...</div><div id="error">Opps! ... File not found!</div><div id="flip"><div id="back_to_top" class="pull-right">back to top</div><div id="edit" class="pull-right">edit</div><div id="pageup">上一章</div><div id="pagedown">下一章</div><div id="toggleSide">菜单</div></div><div class="progress-indicator-2"></div>');
-  
+
   // initialize sidebar and buttons
   if (ditto.sidebar) {
     init_sidebar_section();
@@ -61,7 +61,7 @@ function initialize() {
   if (ditto.edit_button) {
     init_edit_button();
   }
-  
+
   $(ditto.toggleSidebar_id).click(function(){
       $(ditto.sidebar_id).toggle();
   });
@@ -97,16 +97,13 @@ function init_sidebar_section() {
 }
 
 function init_searchbar() {
-  var search = '<form class="searchBox" onSubmit="return searchbar_listener()">' +
-    '<input name="search" type="search">' +
-    '<input type="button" class="searchButton" alt="Search" />' +
-    '</form>';
+  var search = '<form class="searchBox" onSubmit="return searchbar_listener()"><input type="search"><button type="button" alt="Search">🔍</button></form>';
   $(ditto.sidebar_id).find('h2').first().before(search);
 }
 
 function searchbar_listener(event) {
     // event.preventDefault();
-    var q = $('input[name=search]').val();
+    var q = $('.searchBox input').val();
     if (q !== '') {
       window.open(ditto.git_url + '/search?utf8=✓&q=' + encodeURIComponent(q), '_blank');
       win.focus();
@@ -247,7 +244,7 @@ function show_error() {
 function show_loading() {
   var loading = $(ditto.loading_id).show();  // clear content
   $(ditto.content_id).html('');
-  
+
   $(ditto.sidebar_id).css('display', '');
 
   // infinite loop until clearInterval() is called on loading
@@ -256,7 +253,7 @@ function show_loading() {
   }, 2000);
 }
 
-function router() { 
+function router() {
   var path = location.hash.replace(/#([^#]*)(#.*)?/, './$1');
 
   var hashArr = location.hash.split('#');
