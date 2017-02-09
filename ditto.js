@@ -97,7 +97,7 @@ function init_sidebar_section() {
 }
 
 function init_searchbar() {
-  var search = '<form class="searchBox" onSubmit="return searchbar_listener()"><input type="search"><button type="button" alt="Search">🔍</button></form>';
+  var search = '<form class="searchBox" onSubmit="return searchbar_listener()"><input type="search"><button type="submit" alt="Search">🔍</button></form>';
   $(ditto.sidebar_id).find('h2').first().before(search);
 }
 
