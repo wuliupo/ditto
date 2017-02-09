@@ -44,7 +44,7 @@ var getHash = function (hash) {
   }
 };
 
-var menu = new Array();
+var menu = [];
 
 function initialize() {
    $(document.body).append('<div id="sidebar"></div><div id="content"></div><div id="loading">Loading ...</div><div id="error">Opps! ... File not found!</div><div id="flip"><div id="back_to_top" class="pull-right">back to top</div><div id="edit" class="pull-right">edit</div><div id="pageup">上一章</div><div id="pagedown">下一章</div><div id="toggleSide">菜单</div></div><div class="progress-indicator-2"></div>');
@@ -80,27 +80,16 @@ function init_sidebar_section() {
         }
 
         // 初始化内容数组
-        var menuOL = $(ditto.sidebar_id + ' ol');
-        menuOL.attr('start', 0);
-
-        menuOL.find('li a').map(function() {
+        $(ditto.sidebar_id + ' ol').attr('start', 0).find('li a').each(function() {
             menu.push(this.href.slice(this.href.indexOf('#')));
         });
-        $('#pageup').on('click', function() {
+        $('#pageup, #pagedown').click(function() {
             var hash = getHash().nav;
             for (var i = 0; i < menu.length; i++) {
-                if (hash === '') break;
-                if (menu[i] === '#' + hash) break;
+                if (hash === '' || menu[i] === '#' + hash) break;
             }
-            location.hash = menu[i - 1]
-        });
-        $('#pagedown').on('click', function() {
-            var hash = getHash().nav;
-            for (var i = 0; i < menu.length; i++) {
-                if (hash === '') break;
-                if (menu[i] === '#' + hash) break;
-            }
-            location.hash = menu[i + 1];
+            this.id === 'pagedown' ? i++ : i--;
+            location.hash = menu[i >= menu.length || id < 0 ? 0 : i];
         });
     }, "text").fail(function() {
         alert("Opps! can't find the sidebar file to display!");
@@ -112,7 +101,7 @@ function init_searchbar() {
     '<input name="search" type="search">' +
     '<input type="button" class="searchButton" alt="Search" />' +
     '</form>';
-  $(ditto.sidebar_id).find('h2').first().before($(search));
+  $(ditto.sidebar_id).find('h2').first().before(search);
 }
 
 function searchbar_listener(event) {
@@ -127,7 +116,7 @@ function searchbar_listener(event) {
 
 
 function init_back_to_top_button() {
-  $(ditto.back_to_top_id).show().on('click', goTop);
+  $(ditto.back_to_top_id).show().click(goTop);
 }
 
 function goTop(e) {
@@ -135,7 +124,7 @@ function goTop(e) {
   $('html, body').animate({
     scrollTop: 0
   }, 200);
-  history.pushState(null, null, '#' + location.hash.split('#')[1]);
+  history.pushState(null, null, '#' + (location.hash.split('#')[1] || ''));
 }
 
 function goSection(sectionId){
@@ -148,8 +137,7 @@ function init_edit_button() {
   if (ditto.base_url === null) {
     alert("Error! You didn't set 'base_url' when calling ditto.run()!");
   } else {
-    $(ditto.edit_id).show();
-    $(ditto.edit_id).on("click", function() {
+    $(ditto.edit_id).show().click(function() {
       var hash = location.hash.replace("#", "/");
       if (/#.*$/.test(hash)) {
         hash = hash.replace(/#.*$/, '');
@@ -176,16 +164,11 @@ function replace_symbols(text) {
 function li_create_linkage(li_tag, header_level) {
   // add custom id and class attributes
   html_safe_tag = replace_symbols(li_tag.text());
-  li_tag.attr('data-src', html_safe_tag);
-  li_tag.attr("class", "link");
-
-  // add click listener - on click scroll to relevant header section
-  li_tag.click(function(e) {
+  li_tag.attr('data-src', html_safe_tag).attr("class", "link").click(function(e) {
+    // add click listener - on click scroll to relevant header section
     e.preventDefault();
     // scroll to relevant section
-    var header = $(
-      ditto.content_id + " h" + header_level + "." + li_tag.attr('data-src')
-    );
+    var header = $(ditto.content_id + " h" + header_level + "." + li_tag.attr('data-src'));
     $('html, body').animate({
       scrollTop: header.offset().top
     }, 200);
@@ -210,24 +193,21 @@ function create_page_anchors() {
     // parse all headers
     var headers = [];
     $('#content h' + i).map(function() {
-      var content = $(this).text();
+      var content = $(this).text(), title = replace_symbols(content);
       headers.push(content);
-      $(this).addClass(replace_symbols(content));
-      this.id = replace_symbols(content);
-      $(this).hover(function () {
+      $(this).attr('id', title).hover(function () {
         $(this).html(content +
           ' <a href="#' + location.hash.split('#')[1] +
           '#' +
-          replace_symbols(content) +
+          title +
           '" class="section-link">§</a> <a href="#' +
           location.hash.split('#')[1] + '" onclick="goTop()">⇧</a>');
       }, function () {
         $(this).html(content);
-      });
-      $(this).on('click', 'a.section-link', function(event) {
+      }).on('click', 'a.section-link', function(event) {
         event.preventDefault();
-        history.pushState(null, null, '#' + location.hash.split('#')[1] + '#' + replace_symbols(content));
-        goSection(replace_symbols(content));
+        history.pushState(null, null, '#' + location.hash.split('#')[1] + '#' + title);
+        goSection(title);
       });
     });
 
@@ -237,9 +217,7 @@ function create_page_anchors() {
         .addClass('content-toc')
         .attr('id', 'content-toc');
       for (var j = 0; j < headers.length; j++) {
-        var li_tag = $('<li></li>').html('<a href="#' + location.hash.split('#')[1] + '#' + headers[j] + '">' + headers[j] + '</a>');
-        ul_tag.append(li_tag);
-        li_create_linkage(li_tag, i);
+        li_create_linkage($('<li><a href="#' + location.hash.split('#')[1] + '#' + headers[j] + '">' + headers[j] + '</a></li>').appendTo(ul_tag), i);
       }
     }
   }
@@ -251,10 +229,7 @@ function normalize_paths() {
     var src = $(this).attr("src").replace("./", "");
     if ($(this).attr("src").slice(0, 4) !== "http") {
       var pathname = location.pathname.substr(0, location.pathname.length - 1);
-      var url = location.hash.replace("#", "");
-
-      // split and extract base dir
-      url = url.split("/");
+      var url = location.hash.replace("#", "").split("/"); // split and extract base dir
       var base_dir = url.slice(0, url.length - 1).toString();
 
       // normalize the path (i.e. make it absolute)
@@ -335,23 +310,21 @@ function router() {
       Prism.highlightElement(this);
     });
 
-    var perc = ditto.save_progress ? store.get('page-progress') || 0 : 0;
+    var perc = ditto.save_progress && store.get('page-progress') || 0;
 
     if (sectionId) {
       $('html, body').animate({
         scrollTop: ($('#' + decodeURI(sectionId)).offset().top)
       }, 300);
-    } else {
-      if (location.hash !== '' || Boolean(perc)) {
-        if (!Boolean(perc)) {
-          $('html, body').animate({
-            scrollTop: (content.offset().top)
-          }, 300);
-        } else {
-          $('html, body').animate({
-            scrollTop: (content.height()-$(window).height())*perc
-          }, 200);
-        }
+    } else if (location.hash !== '' || Boolean(perc)) {
+      if (!Boolean(perc)) {
+        $('html, body').animate({
+          scrollTop: (content.offset().top)
+        }, 300);
+      } else {
+        $('html, body').animate({
+          scrollTop: (content.height()-$(window).height())*perc
+        }, 200);
       }
     }
     $('#pageup').css('display', location.hash === '' || '#' + getHash().nav === menu[0] ? 'none' : 'inline-block');
@@ -361,7 +334,7 @@ function router() {
       var $w = $(window);
       var $prog2 = $('.progress-indicator-2');
       var sHeight = $('body').height() - $w.height();
-      $w.on('scroll', function() {
+      $w.scroll(function() {
         window.requestAnimationFrame(function(){
           updateProgress(Math.max(0, Math.min(1, $w.scrollTop() / sHeight)));
         });
