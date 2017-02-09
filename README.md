@@ -21,5 +21,6 @@ ditto.sidebar_file = 'sidebar.md';
 // where the docs are actually stored on github - so you can edit
 ditto.base_url = 'https://github.com/wuliupo/ditto/edit/master';
 ditto.git_url = 'https://github.com/wuliupo/ditto';
+ditto.run();
 ```
 
