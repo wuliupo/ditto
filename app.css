@@ -464,7 +464,7 @@ color: #66d9ef;
 }
 
 @media (max-width: 40rem) {
-    #sidebar {
+    #sidebar, .toggle-sidebar {
         display: none;
     }
     #flip #toggleSide {
@@ -484,7 +484,7 @@ color: #66d9ef;
     background-color: #EEE;
     border: 1px solid #DDD;
     outline: none;
-    border-radius: 4px;
+    border-radius: 0 0 4px 0;
     font-size: 12px;
 }
 
