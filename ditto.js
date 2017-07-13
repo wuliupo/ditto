@@ -168,8 +168,12 @@ function li_create_linkage(li_tag, header_level) {
   li_tag.attr('data-src', html_safe_tag).attr("class", "link").click(function(e) {
     // add click listener - on click scroll to relevant header section
     e.preventDefault();
+    var target = '#' + li_tag.attr('data-src');
     // scroll to relevant section
-    var header = $(ditto.content_id + " h" + header_level + "." + li_tag.attr('data-src'));
+    var header = $(ditto.content_id + " h" + header_level + target);
+    if (!header.length) {
+      return;
+    }
     $('html, body').animate({
       scrollTop: header.offset().top
     }, 200);
@@ -180,7 +184,7 @@ function li_create_linkage(li_tag, header_level) {
       // revert back to orig color
       $(this).animate({color: original_color}, 2500);
     });
-    history.pushState(null, null, '#' + location.hash.split('#')[1] + '#' + li_tag.attr('data-src'));
+    history.pushState(null, null, '#' + location.hash.split('#')[1] + target);
   });
 }
 
