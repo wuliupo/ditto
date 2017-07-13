@@ -49,6 +49,10 @@ var menu = [];
 function initialize() {
    $(document.body).append('<div id="sidebar"></div><div id="content"></div><div id="loading">Loading ...</div><div id="error">Opps! ... File not found!</div><div id="flip"><div id="back_to_top" class="pull-right">back to top</div><div id="edit" class="pull-right">edit</div><div id="pageup">上一章</div><div id="pagedown">下一章</div><div id="toggleSide">菜单</div></div><div class="progress-indicator-2"></div>');
 
+   $('<button class="toggle-sidebar">&lt;&gt;</button>').appendTo(document.body).click(function(){
+     $(document.body).toggleClass('hide-sidebar');
+   });
+
   // initialize sidebar and buttons
   if (ditto.sidebar) {
     init_sidebar_section();
@@ -89,7 +93,7 @@ function init_sidebar_section() {
                 if (hash === '' || menu[i] === '#' + hash) break;
             }
             this.id === 'pagedown' ? i++ : i--;
-            location.hash = menu[i >= menu.length || id < 0 ? 0 : i];
+            location.hash = menu[i >= menu.length || this.id < 0 ? 0 : i];
         });
     }, "text").fail(function() {
         alert("Opps! can't find the sidebar file to display!");

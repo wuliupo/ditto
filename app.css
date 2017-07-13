@@ -474,3 +474,23 @@ color: #66d9ef;
         font-size: 0.8rem;
     }
 }
+
+.toggle-sidebar {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1000;
+    cursor: pointer;
+    background-color: #EEE;
+    border: 1px solid #DDD;
+    outline: none;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.hide-sidebar #sidebar {
+    display: none;
+}
+.hide-sidebar #content {
+    padding-left: 20px;
+}
