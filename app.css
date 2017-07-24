@@ -253,6 +253,8 @@ h1 {
     content: "-";
     position: relative;
     left: -5px;
+    float: left;
+    margin-right: 5px;
 }
 
 #content ul li,
