@@ -14,6 +14,7 @@ var ditto = {
     back_to_top_button: true,
     save_progress: true, // 保存阅读进度
     search_bar: true,
+    menu_collapse: true,  // 菜单折叠
     document_title: document.title,
 
     // initialize function
@@ -75,6 +76,10 @@ function initialize() {
   $(window).on('hashchange', router);
 }
 
+function init_menu_collapse() {
+  var sidebar = $('#sidebar').on('click', 'ol li', function(e) {e.stopPropagation(); sidebar.removeClass('close'); $(this).toggleClass('close')}).on('click', 'h2', function(e) {e.stopPropagation(); sidebar.toggleClass('close');});
+}
+
 function init_sidebar_section() {
     $.get(ditto.sidebar_file, function (data) {
         $(ditto.sidebar_id).html(marked(data));
@@ -83,8 +88,12 @@ function init_sidebar_section() {
            init_searchbar();
         }
 
+        if (ditto.menu_collapse) {
+          init_menu_collapse();
+        }
+
         // 初始化内容数组
-        $(ditto.sidebar_id + ' ol').attr('start', 0).find('li a').each(function() {
+        $(ditto.sidebar_id + ' ol').attr('start', 1).find('li a').each(function() {
             menu.push(this.href.slice(this.href.indexOf('#')));
         });
         $('#pageup, #pagedown').click(function() {
@@ -100,9 +109,57 @@ function init_sidebar_section() {
     });
 }
 
+var isSearching = false, lastSearchVal;
+function ontime_search(input) {
+  if (isSearching) {
+    return;
+  }
+  var value = (input.value + '').replace(/\W+/g, '');
+  if (value === lastSearchVal) {
+    return;
+  }
+  var links = $('#sidebar').find('li').find('a'), ols = $('#sidebar').find('ol');
+  if (!value) {
+    ols.find('li').removeClass('hide');
+    links.removeClass('hide');
+    return;
+  }
+  lastSearchVal = value;
+  isSearching = true;
+  links.each(function() {
+    var a = $(this), parent = a.parent('li');
+    if (a.attr('href').indexOf(value) > -1 || a.text().indexOf(value) > -1) {
+      parent.removeClass('hide');
+    } else {
+      parent.addClass('hide');
+    }
+  });
+  ols.each(function() {
+    var ol = $(this), parent = ol.parent('li');
+    if (ol.children().length !== ol.children('.hide').length) {
+      parent.removeClass('hide');
+    } else {
+      parent.addClass('hide');
+    }
+  });
+  isSearching = false;
+  ontime_search(input);
+}
+
 function init_searchbar() {
-  var search = '<form class="searchBox" onSubmit="return searchbar_listener()"><input type="search"><button type="submit" alt="Search">🔍</button></form>';
-  $(ditto.sidebar_id).find('h2').first().before(search);
+  var search = '<form class="searchBox" onSubmit="return searchbar_listener()"><input type="search" onkeyup="ontime_search(this)"  onchange="ontime_search(this)" ><button type="submit" alt="Search">🔍</button></form>';
+  var sidebar = $(ditto.sidebar_id);
+  var header = sidebar.find('h2');
+  if (header.length) {
+    header.first().before(search);
+  } else {
+    header = sidebar.find('h1');
+    if (header.length) {
+      header.first().after(search);
+    } else {
+      sidebar.prepend(search);
+    }
+  }
 }
 
 function searchbar_listener(event) {
@@ -302,6 +359,9 @@ function router() {
     }
     var content = $(ditto.content_id);
     var h1 = content.html(marked(data)).find('h1');
+    if (!h1.length) {
+      h1 = $('<h1>' + hashArr[1] + '</h1>').prependTo(content);
+    }
     if (h1.text() === ditto.document_title) {
       document.title = ditto.document_title;
     } else {
