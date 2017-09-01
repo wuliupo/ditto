@@ -83,9 +83,21 @@ function init_menu_collapse() {
 
 function init_sidebar_section() {
     var sidebar = $(ditto.sidebar_id);
+    var type = ditto.sidebar_file.indexOf('https://api.github.com/') === 0 ? 'jsonp': 'text';
     $.get(ditto.sidebar_file, function (data) {
-        data = (data + '').replace(/\*\s/g, '1. ');  // ul -> ol
-        sidebar.html(marked(data));
+        var content = '';
+        if (type === 'jsonp') { // TODO 优化 GitHub API 目录
+          $.each(data.data.tree, function(i, item) {
+            var path = item.path;
+            if (path.indexOf('/') > 0 && path.indexOf('.md') > 0) {
+              path = path.replace('.md', '');
+              content += '1. [' + path.replace(/^\w+\//, '') + '](#' + path + ')\n';
+            }
+          });
+        } else {
+          content = (data + '').replace(/\*\s/g, '1. ');  // ul -> ol
+        }
+        sidebar.html(marked(content));
 
         sidebar.find('a').each(function() {
             var a = $(this), href = a.attr('href');
@@ -115,7 +127,7 @@ function init_sidebar_section() {
             this.id === 'pagedown' ? i++ : i--;
             location.hash = menu[i >= menu.length || this.id < 0 ? 0 : i];
         });
-    }, "text").fail(function() {
+    }, type).fail(function() {
         alert("Opps! can't find the sidebar file to display!");
     });
 }
