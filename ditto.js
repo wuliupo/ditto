@@ -87,6 +87,7 @@ function init_sidebar_section() {
     $.get(ditto.sidebar_file, function (data) {
         var content = '';
         if (type === 'jsonp') { // TODO 优化 GitHub API 目录
+          content += '# [Contents](#)\n';
           $.each(data.data.tree, function(i, item) {
             var path = item.path;
             if (path.indexOf('/') > 0 && path.indexOf('.md') > 0) {
