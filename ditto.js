@@ -7,6 +7,7 @@ var ditto = {
     back_to_top_id: "#back_to_top",
     loading_id: "#loading",
     error_id: "#error",
+    suffix: ".md",
 
     // display elements
     sidebar: true,
@@ -77,12 +78,22 @@ function initialize() {
 }
 
 function init_menu_collapse() {
-  var sidebar = $('#sidebar').on('click', 'ol li', function(e) {e.stopPropagation(); sidebar.removeClass('close'); $(this).toggleClass('close')}).on('click', 'h2', function(e) {e.stopPropagation(); sidebar.toggleClass('close');});
+  var sidebar = $(ditto.sidebar_id).on('click', 'ol li', function(e) {e.stopPropagation(); sidebar.removeClass('close'); $(this).toggleClass('close')}).on('click', 'h2', function(e) {e.stopPropagation(); sidebar.toggleClass('close');});
 }
 
 function init_sidebar_section() {
+    var sidebar = $(ditto.sidebar_id);
     $.get(ditto.sidebar_file, function (data) {
-        $(ditto.sidebar_id).html(marked(data));
+        data = (data + '').replace(/\*\s/g, '1. ');  // ul -> ol
+        sidebar.html(marked(data));
+
+        sidebar.find('a').each(function() {
+            var a = $(this), href = a.attr('href');
+            if (href.indexOf('#') === 0 || href.indexOf('http://') === 0 || href.indexOf('https://') === 0 || href.indexOf('//') === 0) {
+              return;
+            }
+            a.attr('href', '#' + href.replace(/\.md$/, ''));
+        });
 
         if (ditto.search_bar) {
            init_searchbar();
@@ -93,7 +104,7 @@ function init_sidebar_section() {
         }
 
         // 初始化内容数组
-        $(ditto.sidebar_id + ' ol').attr('start', 1).find('li a').each(function() {
+        sidebar.find('ol').attr('start', 1).find('li a').each(function() {
             menu.push(this.href.slice(this.href.indexOf('#')));
         });
         $('#pageup, #pagedown').click(function() {
@@ -118,7 +129,7 @@ function ontime_search(input) {
   if (value === lastSearchVal) {
     return;
   }
-  var links = $('#sidebar').find('li').find('a'), ols = $('#sidebar').find('ol');
+  var links = $(ditto.sidebar_id).find('li').find('a'), ols = $(ditto.sidebar_id).find('ol');
   if (!value) {
     ols.find('li').removeClass('hide');
     links.removeClass('hide');
@@ -201,10 +212,10 @@ function init_edit_button() {
         hash = hash.replace(/#.*$/, '');
       }
       if (hash === "") {
-        hash = "/" + ditto.index.replace(".md", "");
+        hash = "/" + ditto.index.replace(ditto.suffix, "");
       }
 
-      window.open(ditto.base_url + hash + ".md");
+      window.open(ditto.base_url + hash + ditto.suffix);
       // open is better than redirecting, as the previous page history
       // with redirect is a bit messed up
     });
@@ -250,11 +261,12 @@ function create_page_anchors() {
   // if there is a match, create click listeners
   // and scroll to relevant sections
 
+  var content = $(ditto.content_id);
   // go through header level 1 to 3
   for (var i = 2; i <= 4; i++) {
     // parse all headers
     var headers = [];
-    $('#content h' + i).map(function() {
+    content.find('h' + i).map(function() {
       var content = $(this).text(), title = replace_symbols(content);
       headers.push(content);
       $(this).attr('id', title).hover(function () {
@@ -275,27 +287,31 @@ function create_page_anchors() {
 
     if ((i === 2) && headers.length !== 0) {
       var ul_tag = $('<ol></ol>')
-        .insertAfter('#content h1')
+        .insertAfter(ditto.content_id + ' h1')
         .addClass('content-toc')
         .attr('id', 'content-toc');
+      var hash1 = location.hash.split('#')[1];
       for (var j = 0; j < headers.length; j++) {
-        li_create_linkage($('<li><a href="#' + location.hash.split('#')[1] + '#' + headers[j] + '">' + headers[j] + '</a></li>').appendTo(ul_tag), i);
+        li_create_linkage($('<li><a href="#' + hash1 + '#' + headers[j] + '">' + headers[j] + '</a></li>').appendTo(ul_tag), i);
       }
     }
   }
 }
 
 function normalize_paths() {
+  var path = location.pathname;
+
+  if (path.indexOf('/') !== path.length - 1) {
+    path += '/';
+  }
+  var url = location.hash.replace("#", "").split("/"); // split and extract base dir
+  path += url.slice(0, url.length - 1) + '/';
   // images
   $(ditto.content_id + " img").map(function() {
     var src = $(this).attr("src").replace("./", "");
     if ($(this).attr("src").slice(0, 4) !== "http") {
-      var pathname = location.pathname.substr(0, location.pathname.length - 1);
-      var url = location.hash.replace("#", "").split("/"); // split and extract base dir
-      var base_dir = url.slice(0, url.length - 1).toString();
-
       // normalize the path (i.e. make it absolute)
-      $(this).attr("src", pathname + base_dir + "/" + src);
+      $(this).attr("src", path + src);
     }
   });
 }
@@ -339,8 +355,8 @@ function router() {
   } else if (!path) {
     path = location.pathname + ditto.index;
     normalize_paths();
-  } else {
-    path += ".md";
+  } else if (path.indexOf(ditto.suffix) < 0) {  // TODO 后缀判断不严谨
+    path += ditto.suffix;
   }
 
   // 取消scroll事件的监听函数
