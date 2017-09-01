@@ -301,11 +301,10 @@ function create_page_anchors() {
 function normalize_paths() {
   var path = location.pathname;
 
-  if (path.indexOf('/') !== path.length - 1) {
+  if (path.lastIndexOf('/') !== path.length - 1) {
     path += '/';
   }
-  var url = location.hash.replace("#", "").split("/"); // split and extract base dir
-  path += url.slice(0, url.length - 1) + '/';
+  path += location.hash.replace("#", "").replace(/\w+$/, ""); // split and extract base dir
   // images
   $(ditto.content_id + " img").map(function() {
     var src = $(this).attr("src").replace("./", "");
