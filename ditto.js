@@ -382,6 +382,12 @@ function router() {
   var loading = show_loading();
   $.get(path, function(data) {
     $(ditto.error_id).hide();
+    if (ditto.suffix === '.txt') {
+      data = '# ' + data;
+      data = data.replace(/\n\s+/g, '\n');
+      data = data.replace(/\r|\n+/g, '\n\n');
+    }
+
     if (data.indexOf('title: ') > 0) {
         data = data.replace('---', '```').replace('---', '```');
         // TODO regexp
