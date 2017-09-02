@@ -88,13 +88,16 @@ function init_sidebar_section() {
         var content = '';
         if (type === 'jsonp') { // TODO 优化 GitHub API 目录
           content += '# [Contents](#)\n';
-          $.each(data.data.tree, function(i, item) {
+          $.each(data && data.data && data.data.tree || [], function(i, item) {
             var path = item.path;
-            if (path.indexOf('/') > 0 && path.indexOf('.md') > 0) {
-              path = path.replace('.md', '');
+            if (path.indexOf('/') > 0 && path.indexOf(ditto.suffix) > 0) {
+              path = path.replace(ditto.suffix, '');
               content += '1. [' + path.replace(/^\w+\//, '') + '](#' + path + ')\n';
             }
           });
+          if (content.length < 20) {
+            content += '`代码仓库没有内容`\n<' + ditto.git_url + '>';
+          }
         } else {
           content = (data + '').replace(/\*\s/g, '1. ');  // ul -> ol
         }
@@ -105,7 +108,7 @@ function init_sidebar_section() {
             if (href.indexOf('#') === 0 || href.indexOf('http://') === 0 || href.indexOf('https://') === 0 || href.indexOf('//') === 0) {
               return;
             }
-            a.attr('href', '#' + href.replace(/\.md$/, ''));
+            a.attr('href', '#' + href.replace(ditto.suffix, ''));
         });
 
         if (ditto.search_bar) {
