@@ -55,7 +55,7 @@ function initialize() {
      $(document.body).toggleClass('hide-sidebar');
    });
 
-   $(document.body).on('click touchend', function(event) {
+   $(document.body).on('dbclick', function(event) {
      event.preventDefault();
      $(this).toggleClass('hide-toolbar');
    });
