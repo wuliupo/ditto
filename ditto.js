@@ -56,7 +56,7 @@ function initialize() {
    });
 
    var lastClick = 0;
-   $(document.body).on('click tap', function() {
+   $(document.body).on('tap', function() {
      if (new Date() - lastClick > 2000) {
       lastClick = new Date();
       $(this).toggleClass('hide-toolbar');
