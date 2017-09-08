@@ -525,7 +525,7 @@ color: #66d9ef;
     display: initial !important;
 }
 
-.hide-sidebar #sidebar {
+.hide-sidebar #sidebar, .hide-toolbar #flip, .hide-toolbar .toggle-sidebar {
     display: none;
 }
 .hide-sidebar #content {

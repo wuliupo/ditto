@@ -55,6 +55,10 @@ function initialize() {
      $(document.body).toggleClass('hide-sidebar');
    });
 
+   $(document.body).click(function(){
+     $(this).toggleClass('hide-toolbar');
+   });
+
   // initialize sidebar and buttons
   if (ditto.sidebar) {
     init_sidebar_section();
