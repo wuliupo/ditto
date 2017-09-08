@@ -55,9 +55,12 @@ function initialize() {
      $(document.body).toggleClass('hide-sidebar');
    });
 
-   $(document.body).on('dbclick', function(event) {
-     event.preventDefault();
-     $(this).toggleClass('hide-toolbar');
+   var lastClick = 0;
+   $(document.body).on('click tap', function() {
+     if (new Data() - lastClick > 2000) {
+      lastClick = new Data();
+      $(this).toggleClass('hide-toolbar');
+     }
    });
 
   // initialize sidebar and buttons
