@@ -51,11 +51,12 @@ var menu = [];
 function initialize() {
    $(document.body).append('<div id="sidebar"></div><div id="content"></div><div id="loading">Loading ...</div><div id="error">Opps! ... File not found!</div><div id="flip"><div id="back_to_top" class="pull-right">back to top</div><div id="edit" class="pull-right">edit</div><div id="pageup">上一章</div><div id="pagedown">下一章</div><div id="toggleSide">菜单</div></div><div class="progress-indicator-2"></div>');
 
-   $('<button class="toggle-sidebar">&lt;&gt;</button>').appendTo(document.body).click(function(){
+   $('<button class="toggle-sidebar">&lt;&gt;</button>').appendTo(document.body).click(function() {
      $(document.body).toggleClass('hide-sidebar');
    });
 
-   $(document.body).click(function(){
+   $(document.body).on('click touchend', function(event) {
+     event.preventDefault();
      $(this).toggleClass('hide-toolbar');
    });
 
