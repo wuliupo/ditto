@@ -328,10 +328,13 @@ function normalize_paths() {
   if (path.lastIndexOf('/') !== path.length - 1) {
     path += '/';
   }
-  path += location.hash.replace("#", "").replace(/\w+$/, ""); // split and extract base dir
+  path += location.hash.replace("#", "").replace(/#.*/, "").replace(/\w+$/, ""); // split and extract base dir
   // images
   $(ditto.content_id + " img").map(function() {
-    var src = $(this).attr("src").replace("./", "");
+    var src = $(this).attr("src");
+    if (src.indexOf('../') < 0) {
+      src = src.replace("./", "");
+    }
     if ($(this).attr("src").slice(0, 4) !== "http") {
       // normalize the path (i.e. make it absolute)
       $(this).attr("src", path + src);
