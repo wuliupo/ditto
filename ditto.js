@@ -328,7 +328,7 @@ function normalize_paths() {
   if (path.lastIndexOf('/') !== path.length - 1) {
     path += '/';
   }
-  path += location.hash.replace("#", "").replace(/#.*/, "").replace(/\w+$/, ""); // split and extract base dir
+  path += location.hash.replace("#", "").replace(/#.*/, "").replace(/[\w\-]+$/, ""); // split and extract base dir
   // images
   $(ditto.content_id + " img").map(function() {
     var src = $(this).attr("src");
@@ -398,6 +398,9 @@ function router() {
       data = data.replace(/\n\s+/g, '\n');
       data = data.replace(/\r|\n+/g, '\n\n');
     }
+
+    // 开头的 h2, h3 全部变为标题
+    data = data.replace(/^#+/, '#');
 
     if (data.indexOf('title: ') > 0) {
         data = data.replace('---', '```').replace('---', '```');
