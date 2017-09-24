@@ -393,6 +393,9 @@ function router() {
   var loading = show_loading();
   $.get(path, function(data) {
     $(ditto.error_id).hide();
+
+    data = data.replace(/^\s+|\s+$/, '');
+
     if (ditto.suffix === '.txt') {
       data = '# ' + data;
       data = data.replace(/\n\s+/g, '\n');
