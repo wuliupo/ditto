@@ -328,7 +328,7 @@ function normalize_paths() {
   if (path.lastIndexOf('/') !== path.length - 1) {
     path += '/';
   }
-  path += location.hash.replace("#", "").replace(/#.*/, "").replace(/[\w\-]+$/, ""); // split and extract base dir
+  path += location.hash.replace("#", "").replace(/#.*/, "").replace(/^\.\//, "").replace(/[\w\-\s\.%_;]+$/, ""); // split and extract base dir
   // images
   $(ditto.content_id + " img").map(function() {
     var src = $(this).attr("src");
