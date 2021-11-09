@@ -172,6 +172,7 @@ h1 {
     font-size: 0.8rem;
 	line-height:1.3rem;
 	counter-reset: section;
+    background-color: #fff;
 }
 
 @media (min-width: 40rem) {
